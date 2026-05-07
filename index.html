@@ -377,27 +377,26 @@ const COURSES_URL = 'https://script.google.com/macros/s/AKfycbynv2noOqQuWSoMQdBy
 let COURSES = [];
 
 function loadCourses() {
-  const script = document.createElement('script');
-  window._coursesCallback = function(data) {
-    COURSES = data;
-    document.getElementById('course-list').innerHTML = COURSES.map(c => `
-      <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
-        <div class="pb-ball">${pbSVG(32)}</div>
-        <div class="course-info">
-          <div class="course-loc">${c.name}</div>
-          <div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
-          <div class="course-meta">
-            <span class="meta-item">📅 ${c.date}</span>
-            <span class="meta-item">🕐 ${c.time}</span>
-          </div>
+  COURSES = [
+    {id:'c1', name:'暑期班課程', location:'新莊宏匯 匹克球場', date:'7/13-17', time:'15:00-17:00', spots:8},
+    {id:'c2', name:'暑期班課程', location:'景美河濱 匹克球場', date:'7/20-24', time:'16:00-18:00', spots:8},
+    {id:'c3', name:'暑期班課程', location:'新店小碧潭', date:'8/3-8/7', time:'15:00-17:00', spots:8},
+  ];
+  document.getElementById('course-list').innerHTML = COURSES.map(c => `
+    <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
+      <div class="pb-ball">${pbSVG(32)}</div>
+      <div class="course-info">
+        <div class="course-loc">${c.name}</div>
+        <div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
+        <div class="course-meta">
+          <span class="meta-item">📅 ${c.date}</span>
+          <span class="meta-item">🕐 ${c.time}</span>
         </div>
-        <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
-        <div class="check-circle" id="chk${c.id}">✓</div>
       </div>
-    `).join('');
-  };
-  script.src = COURSES_URL + '?callback=_coursesCallback';
-  document.head.appendChild(script);
+      <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
+      <div class="check-circle" id="chk${c.id}">✓</div>
+    </div>
+  `).join('');
 }
 
 loadCourses();
