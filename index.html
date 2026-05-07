@@ -376,28 +376,28 @@ const COURSES_URL = 'https://script.google.com/macros/s/AKfycbynv2noOqQuWSoMQdBy
 
 let COURSES = [];
 
-async function loadCourses() {
-  try {
-    const res = await fetch(COURSES_URL);
-    COURSES = await res.json();
-  } catch(e) {
-    COURSES = [];
-  }
-  document.getElementById('course-list').innerHTML = COURSES.map(c => `
-    <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
-      <div class="pb-ball">${pbSVG(32)}</div>
-      <div class="course-info">
-        <div class="course-loc">${c.name}</div>
-        <div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
-        <div class="course-meta">
-          <span class="meta-item">📅 ${c.date}</span>
-          <span class="meta-item">🕐 ${c.time}</span>
+function loadCourses() {
+  const script = document.createElement('script');
+  window._coursesCallback = function(data) {
+    COURSES = data;
+    document.getElementById('course-list').innerHTML = COURSES.map(c => `
+      <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
+        <div class="pb-ball">${pbSVG(32)}</div>
+        <div class="course-info">
+          <div class="course-loc">${c.name}</div>
+          <div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
+          <div class="course-meta">
+            <span class="meta-item">📅 ${c.date}</span>
+            <span class="meta-item">🕐 ${c.time}</span>
+          </div>
         </div>
+        <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
+        <div class="check-circle" id="chk${c.id}">✓</div>
       </div>
-      <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
-      <div class="check-circle" id="chk${c.id}">✓</div>
-    </div>
-  `).join('');
+    `).join('');
+  };
+  script.src = COURSES_URL + '?callback=_coursesCallback';
+  document.head.appendChild(script);
 }
 
 loadCourses();
