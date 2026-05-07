@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShareME 匹克球課程報名</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0c2d5e;
+  --blue: #1a6bc4;
+  --blue-bright: #2f8cef;
+  --blue-light: #e8f2fc;
+  --blue-pale: #f3f8fe;
+  --blue-mid: #b8d4f0;
+  --gold: #d4a030;
+  --white: #ffffff;
+  --text: #0c1a2e;
+  --text-muted: #5a6a82;
+  --border: #c4d8f0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans TC', 'Taipei Sans TC Beta', sans-serif; background: var(--blue-pale); color: var(--text); min-height: 100vh; }
+
+.hero { background: var(--navy); position: relative; overflow: hidden; padding: 0; }
+.hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 20%, rgba(47,140,239,0.18) 0%, transparent 60%), radial-gradient(ellipse at 10% 80%, rgba(26,107,196,0.2) 0%, transparent 50%); }
+.hero-wave { position: absolute; bottom: -1px; left: 0; right: 0; }
+.hero-inner { position: relative; z-index: 2; padding: 2rem 1.5rem 3rem; text-align: center; }
+.hero-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1.25rem; }
+.logo-icon { width: 40px; height: 40px; }
+.logo-text { text-align: left; }
+.logo-en { font-size: 1.1rem; font-weight: 700; color: white; letter-spacing: 1px; }
+.logo-zh { font-size: 0.65rem; color: rgba(255,255,255,0.55); letter-spacing: 3px; }
+.hero-pb-icon { margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; }
+.hero h1 { font-size: 1.6rem; font-weight: 700; color: white; line-height: 1.5; margin-bottom: 0.5rem; letter-spacing: 1px; }
+.hero h1 em { font-style: normal; color: #7dc4ff; }
+.hero-sub { font-size: 0.72rem; color: rgba(255,255,255,0.5); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.75rem; }
+.hero-desc { font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.9; }
+
+.progress-wrap { background: white; border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; }
+.progress-bar { display: flex; align-items: center; max-width: 400px; margin: 0 auto; }
+.prog-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
+.prog-item:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: 55%; width: 90%; height: 1.5px; background: var(--border); z-index: 0; }
+.prog-item.done:not(:last-child)::after { background: var(--blue); }
+.prog-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--blue-pale); border: 1.5px solid var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; position: relative; z-index: 1; transition: all 0.3s; }
+.prog-item.active .prog-dot { background: var(--blue-bright); border-color: var(--blue-bright); color: white; box-shadow: 0 0 0 5px rgba(47,140,239,0.15); }
+.prog-item.done .prog-dot { background: var(--navy); border-color: var(--navy); color: white; }
+.prog-label { font-size: 9px; color: var(--text-muted); letter-spacing: 0.5px; white-space: nowrap; }
+.prog-item.active .prog-label { color: var(--blue-bright); font-weight: 500; }
+.prog-item.done .prog-label { color: var(--navy); }
+
+.main { padding: 1.5rem 1.25rem; max-width: 460px; margin: 0 auto; }
+.step { display: none; }
+.step.active { display: block; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.step-head { margin-bottom: 1.25rem; }
+.step-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 0.3rem; }
+.step-title-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.7; padding-left: 36px; }
+
+.course-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 1.5rem; }
+.course-card { background: white; border: 1.5px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+.course-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; border-radius: 16px 0 0 16px; transition: background 0.2s; }
+.course-card:hover:not(.full) { border-color: var(--blue-bright); box-shadow: 0 4px 20px rgba(47,140,239,0.1); transform: translateY(-1px); }
+.course-card:hover:not(.full)::before { background: var(--blue-bright); }
+.course-card.selected { border-color: var(--blue-bright); background: linear-gradient(135deg, var(--blue-light) 0%, white 100%); box-shadow: 0 4px 20px rgba(47,140,239,0.12); }
+.course-card.selected::before { background: var(--blue-bright); }
+.course-card.full { opacity: 0.4; cursor: not-allowed; }
+.pb-ball { width: 48px; height: 48px; border-radius: 12px; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
+.course-card.selected .pb-ball { background: rgba(47,140,239,0.15); }
+.course-info { flex: 1; }
+.course-loc { font-weight: 700; font-size: 0.9rem; color: var(--navy); letter-spacing: 0.3px; }
+.course-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: flex; gap: 10px; }
+.meta-item { display: flex; align-items: center; gap: 3px; }
+.spots-badge { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; letter-spacing: 0.3px; }
+.open { background: #e6f3ff; color: var(--navy); }
+.full-badge { background: #fce8e8; color: #791F1F; }
+.check-circle { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 10px; color: transparent; }
+.course-card.selected .check-circle { background: var(--blue-bright); border-color: var(--blue-bright); color: white; }
+
+.form-section { background: white; border-radius: 16px; border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1rem; }
+.form-section-title { font-size: 0.78rem; font-weight: 700; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--blue-light); display: flex; align-items: center; gap: 6px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-group { margin-bottom: 0.75rem; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--navy); margin-bottom: 5px; letter-spacing: 0.3px; }
+.req { color: #e24b4a; margin-left: 2px; }
+.form-input, .form-select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.85rem; font-family: inherit; color: var(--text); background: var(--blue-pale); outline: none; transition: all 0.2s; -webkit-appearance: none; }
+.form-input:focus, .form-select:focus { border-color: var(--blue-bright); background: white; box-shadow: 0 0 0 3px rgba(47,140,239,0.08); }
+
+.upload-zone { border: 2px dashed var(--border); border-radius: 14px; padding: 1.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; background: white; }
+.upload-zone:hover { border-color: var(--blue-bright); background: var(--blue-pale); }
+.upload-zone.has-file { border-style: solid; border-color: var(--blue-bright); background: var(--blue-pale); }
+#file-input { display: none; }
+.upload-pb { margin: 0 auto 0.75rem; }
+.upload-title { font-size: 0.88rem; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+.upload-sub { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+.file-chip { display: none; align-items: center; gap: 8px; background: var(--blue-light); border-radius: 8px; padding: 8px 12px; margin-top: 10px; }
+.file-chip.show { display: flex; }
+.file-chip-name { font-size: 0.78rem; color: var(--navy); font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-chip-del { font-size: 14px; cursor: pointer; color: var(--text-muted); flex-shrink: 0; }
+.notice-box { background: rgba(212,160,48,0.08); border: 1px solid rgba(212,160,48,0.3); border-radius: 10px; padding: 10px 13px; font-size: 0.75rem; color: #7a5010; line-height: 1.7; margin-bottom: 1rem; display: flex; gap: 8px; align-items: flex-start; }
+
+.summary-block { background: white; border-radius: 14px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
+.summary-head { background: var(--navy); padding: 9px 14px; font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.85); letter-spacing: 1px; }
+.summary-row { display: flex; padding: 9px 14px; border-bottom: 1px solid var(--blue-pale); font-size: 0.8rem; }
+.summary-row:last-child { border-bottom: none; }
+.sk { color: var(--text-muted); width: 72px; flex-shrink: 0; font-size: 0.75rem; }
+.sv { color: var(--text); font-weight: 500; }
+
+.btn-primary { width: 100%; padding: 13px 16px; background: var(--blue-bright); color: white; border: none; border-radius: 12px; font-size: 0.9rem; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-primary:hover { background: #1a7ada; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(47,140,239,0.3); }
+.btn-primary:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-ghost { width: 100%; padding: 11px; margin-top: 8px; background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: 12px; font-size: 0.82rem; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+
+.success-wrap { text-align: center; padding: 2.5rem 1rem; }
+.success-pb { margin: 0 auto 1.25rem; width: 80px; height: 80px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.success-title { font-size: 1.35rem; font-weight: 700; color: var(--navy); margin-bottom: 0.75rem; letter-spacing: 0.5px; }
+.success-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 2; }
+.success-tag { display: inline-block; margin-top: 1.25rem; background: var(--blue-light); color: var(--blue); padding: 6px 18px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.5px; }
+
+.overlay { display: none; position: fixed; inset: 0; background: rgba(12,45,94,0.72); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+.overlay.show { display: flex; }
+.spin { width: 42px; height: 42px; border: 3px solid rgba(255,255,255,0.25); border-top-color: white; border-radius: 50%; animation: rot 0.8s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+.overlay-text { color: rgba(255,255,255,0.8); font-size: 0.82rem; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="14" r="7" fill="none" stroke="white" stroke-width="2"/>
+        <path d="M12 26 Q20 20 28 26 Q20 34 12 26Z" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+        <path d="M16 14 Q20 10 24 14" stroke="#7dc4ff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="logo-text">
+        <div class="logo-en">ShareME</div>
+        <div class="logo-zh">分享力計劃</div>
+      </div>
+    </div>
+    <div class="hero-pb-icon">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="28" fill="rgba(47,140,239,0.12)" stroke="rgba(47,140,239,0.3)" stroke-width="1"/>
+        <circle cx="32" cy="32" r="18" fill="white" opacity="0.95"/>
+        <circle cx="32" cy="32" r="18" fill="none" stroke="rgba(47,140,239,0.4)" stroke-width="1.5"/>
+        <circle cx="26" cy="26" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="32" cy="24" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="38" cy="26" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="24" cy="32" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="30" cy="31" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="36" cy="31" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="42" cy="32" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="26" cy="38" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="32" cy="40" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <circle cx="38" cy="38" r="1.8" fill="#2f8cef" opacity="0.5"/>
+        <rect x="42" y="38" width="14" height="5" rx="2.5" fill="#1a6bc4" transform="rotate(45 42 38)"/>
+      </svg>
+    </div>
+    <p class="hero-sub">Share Your Ability · Change Their Future</p>
+    <h1>匹克球<em>免費課程</em><br>線上報名</h1>
+    <p class="hero-desc">專為資源班學生及低收入戶家庭設計<br>讓每個孩子都有機會接觸運動</p>
+  </div>
+  <svg class="hero-wave" viewBox="0 0 375 32" preserveAspectRatio="none" height="32">
+    <path d="M0 32 Q93 0 187 16 Q281 32 375 8 L375 32Z" fill="#f3f8fe"/>
+  </svg>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar">
+    <div class="prog-item active" id="pg0"><div class="prog-dot">1</div><div class="prog-label">選課程</div></div>
+    <div class="prog-item" id="pg1"><div class="prog-dot">2</div><div class="prog-label">填資料</div></div>
+    <div class="prog-item" id="pg2"><div class="prog-dot">3</div><div class="prog-label">上傳文件</div></div>
+    <div class="prog-item" id="pg3"><div class="prog-dot">4</div><div class="prog-label">確認送出</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Step 1 -->
+  <div class="step active" id="s0">
+    <div class="step-head">
+      <div class="step-title">
+        <div class="step-title-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="2" stroke="#2f8cef" stroke-width="1.5"/><path d="M5 5h6M5 8h6M5 11h4" stroke="#2f8cef" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        選擇課程時段
+      </div>
+      <div class="step-desc">請選擇您方便參加的地點與時間</div>
+    </div>
+    <div class="course-list" id="course-list"></div>
+    <button class="btn-primary" id="btn0" onclick="go(1)" disabled>
+      <span>下一步：填寫學生資料</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="s1">
+    <div class="step-head">
+      <div class="step-title">
+        <div class="step-title-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="#2f8cef" stroke-width="1.5"/><path d="M2 13c0-3 2.5-5 6-5s6 2 6 5" stroke="#2f8cef" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        學生基本資料
+      </div>
+      <div class="step-desc">請填寫報名學生的相關資訊</div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="4" r="2.5" stroke="#1a6bc4" stroke-width="1.2"/><path d="M1 10c0-2.5 2-4 5-4s5 1.5 5 4" stroke="#1a6bc4" stroke-width="1.2" stroke-linecap="round"/></svg>
+        學生資料
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">學生姓名<span class="req">*</span></label><input class="form-input" id="fn" type="text" placeholder="王小明"></div>
+        <div class="form-group"><label class="form-label">就讀學校<span class="req">*</span></label><input class="form-input" id="fs" type="text" placeholder="大安國小"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">年級<span class="req">*</span></label>
+          <select class="form-select" id="fg">
+            <option value="">請選擇</option>
+            <option>一年級</option><option>二年級</option><option>三年級</option>
+            <option>四年級</option><option>五年級</option><option>六年級</option>
+            <option>七年級</option><option>八年級</option><option>九年級</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">身分類別<span class="req">*</span></label>
+          <select class="form-select" id="fi">
+            <option value="">請選擇</option>
+            <option>低收入戶證明</option><option>中低收入戶證明</option>
+            <option>身心障礙手冊</option><option>資源班證明</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="3" width="10" height="7" rx="1.5" stroke="#1a6bc4" stroke-width="1.2"/><path d="M1 5l5 3 5-3" stroke="#1a6bc4" stroke-width="1.2"/></svg>
+        聯絡資料
+      </div>
+      <div class="form-group"><label class="form-label">家長／監護人姓名<span class="req">*</span></label><input class="form-input" id="fp" type="text" placeholder="王大明"></div>
+      <div class="form-group"><label class="form-label">聯絡電話<span class="req">*</span></label><input class="form-input" id="fph" type="tel" placeholder="0912-345-678"></div>
+    </div>
+    <button class="btn-primary" onclick="go(2)">
+      <span>下一步：上傳證明文件</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="btn-ghost" onclick="go(0)">← 返回選課程</button>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="s2">
+    <div class="step-head">
+      <div class="step-title">
+        <div class="step-title-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 5l3-3 3 3" stroke="#2f8cef" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 10v3h10v-3" stroke="#2f8cef" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        上傳證明文件
+      </div>
+      <div class="step-desc">請上傳身分資格的證明文件照片</div>
+    </div>
+    <div class="notice-box">
+      <span style="font-size:14px;flex-shrink:0">⚠️</span>
+      <span>請確認照片清晰可辨識，且文件在有效期限內。支援 JPG、PNG、PDF 格式，檔案大小上限 10MB。</span>
+    </div>
+    <div class="upload-zone" id="uz" onclick="document.getElementById('file-input').click()">
+      <div class="upload-pb">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="19" fill="#e8f2fc" stroke="#c4d8f0" stroke-width="1"/>
+          <circle cx="22" cy="22" r="12" fill="white" stroke="#c4d8f0" stroke-width="1"/>
+          <circle cx="18" cy="18" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="22" cy="17" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="26" cy="18" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="17" cy="22" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="21" cy="22" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="25" cy="22" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="29" cy="22" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="18" cy="26" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="22" cy="27" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <circle cx="26" cy="26" r="1.3" fill="#2f8cef" opacity="0.5"/>
+          <rect x="29" y="27" width="10" height="3.5" rx="1.75" fill="#1a6bc4" transform="rotate(45 29 27)"/>
+        </svg>
+      </div>
+      <div class="upload-title">點擊上傳證明文件</div>
+      <div class="upload-sub">支援 JPG、PNG、PDF · 上限 10MB<br>或直接拖曳檔案至此</div>
+      <input type="file" id="file-input" accept="image/*,.pdf" onchange="handleFile(this)">
+    </div>
+    <div class="file-chip" id="fchip">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="#1a6bc4" stroke-width="1.2"/><path d="M4 5h6M4 7h6M4 9h4" stroke="#1a6bc4" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <span class="file-chip-name" id="fname"></span>
+      <span class="file-chip-del" onclick="clearFile()">✕</span>
+    </div>
+    <button class="btn-primary" id="btn2" onclick="go(3)" style="margin-top:1.25rem" disabled>
+      <span>下一步：確認報名資料</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="btn-ghost" onclick="go(1)">← 返回填資料</button>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step" id="s3">
+    <div class="step-head">
+      <div class="step-title">
+        <div class="step-title-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#2f8cef" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#2f8cef" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        確認報名資料
+      </div>
+      <div class="step-desc">請確認以下資料無誤後送出</div>
+    </div>
+    <div class="summary-block">
+      <div class="summary-head">課程資訊</div>
+      <div class="summary-row"><span class="sk">地點</span><span class="sv" id="sl">—</span></div>
+      <div class="summary-row"><span class="sk">日期</span><span class="sv" id="sd">—</span></div>
+      <div class="summary-row"><span class="sk">時段</span><span class="sv" id="st">—</span></div>
+    </div>
+    <div class="summary-block">
+      <div class="summary-head">學生資料</div>
+      <div class="summary-row"><span class="sk">姓名</span><span class="sv" id="sn">—</span></div>
+      <div class="summary-row"><span class="sk">學校</span><span class="sv" id="ss">—</span></div>
+      <div class="summary-row"><span class="sk">年級</span><span class="sv" id="sg">—</span></div>
+      <div class="summary-row"><span class="sk">身分</span><span class="sv" id="si">—</span></div>
+      <div class="summary-row"><span class="sk">家長</span><span class="sv" id="sp">—</span></div>
+      <div class="summary-row"><span class="sk">電話</span><span class="sv" id="sph">—</span></div>
+    </div>
+    <button class="btn-primary" onclick="submit()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>確認送出報名</span>
+    </button>
+    <button class="btn-ghost" onclick="go(2)">← 返回修改</button>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step" id="s4">
+    <div class="success-wrap">
+      <div class="success-pb">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="12" fill="white" stroke="#c4d8f0" stroke-width="1"/>
+          <circle cx="18" cy="18" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="22" cy="17" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="26" cy="18" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="17" cy="22" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="21" cy="22" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="25" cy="22" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="29" cy="22" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="18" cy="26" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="22" cy="27" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <circle cx="26" cy="26" r="1.3" fill="#2f8cef" opacity="0.6"/>
+          <rect x="29" y="27" width="10" height="3.5" rx="1.75" fill="#1a6bc4" transform="rotate(45 29 27)"/>
+        </svg>
+      </div>
+      <div class="success-title">報名成功！</div>
+      <div class="success-desc">我們已收到您的報名資料<br>志工將在 1–2 個工作天內完成審核<br>審核結果將透過 LINE 官方帳號通知您</div>
+      <div class="success-tag">感謝您讓孩子參與 ShareME 公益計劃 ❤️</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="overlay" id="ov">
+  <div class="spin"></div>
+  <div class="overlay-text">送出中，請稍候⋯</div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjXnibLsLq5TVyOk42Tnqdx03zcj034GD2mAfT6u_RTyOkj3gL6VIAgsMt6gwoAp3AXg/exec';
+
+const COURSES = [
+  {id:'c1', location:'台北大安', date:'6/14（六）', time:'09:00–10:00', spots:6},
+  {id:'c2', location:'台北大安', date:'6/14（六）', time:'10:00–11:00', spots:4},
+  {id:'c3', location:'新北板橋', date:'6/15（日）', time:'14:00–15:00', spots:8},
+  {id:'c4', location:'新北板橋', date:'6/15（日）', time:'15:00–16:00', spots:0},
+];
+
+let sel = null, file = null;
+
+function pbSVG(size=36) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="12" fill="white" stroke="#c4d8f0" stroke-width="1.2"/>
+    <circle cx="14" cy="14" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="18" cy="13" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="22" cy="14" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="13" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="17" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="21" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="25" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="14" cy="22" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="18" cy="23" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <circle cx="22" cy="22" r="1.1" fill="#2f8cef" opacity="0.55"/>
+    <rect x="23" y="22" width="9" height="3" rx="1.5" fill="#1a6bc4" transform="rotate(45 23 22)"/>
+  </svg>`;
+}
+
+document.getElementById('course-list').innerHTML = COURSES.map(c => `
+  <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
+    <div class="pb-ball">${pbSVG(32)}</div>
+    <div class="course-info">
+      <div class="course-loc">${c.location}</div>
+      <div class="course-meta">
+        <span class="meta-item">📅 ${c.date}</span>
+        <span class="meta-item">🕐 ${c.time}</span>
+      </div>
+    </div>
+    <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
+    <div class="check-circle" id="chk${c.id}">✓</div>
+  </div>
+`).join('');
+
+function pick(id) {
+  document.querySelectorAll('.course-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('cc'+id).classList.add('selected');
+  sel = COURSES.find(c => c.id===id);
+  document.getElementById('btn0').disabled = false;
+}
+
+function go(n) {
+  if(n===1 && !sel) { alert('請選擇課程時段'); return; }
+  if(n===2 && !validate1()) return;
+  if(n===3) fillSummary();
+  document.querySelectorAll('.step').forEach((s,i) => s.classList.toggle('active', i===n));
+  document.querySelectorAll('.prog-item').forEach((p,i) => {
+    p.classList.remove('active','done');
+    if(i===n) p.classList.add('active');
+    else if(i<n) p.classList.add('done');
+  });
+  window.scrollTo(0,0);
+}
+
+function validate1() {
+  for(const id of ['fn','fs','fg','fi','fp','fph']) {
+    if(!document.getElementById(id).value.trim()) {
+      alert('請填寫所有必填欄位');
+      document.getElementById(id).focus();
+      return false;
+    }
+  }
+  return true;
+}
+
+function fillSummary() {
+  document.getElementById('sl').textContent = sel.location;
+  document.getElementById('sd').textContent = sel.date;
+  document.getElementById('st').textContent = sel.time;
+  document.getElementById('sn').textContent = document.getElementById('fn').value;
+  document.getElementById('ss').textContent = document.getElementById('fs').value;
+  document.getElementById('sg').textContent = document.getElementById('fg').value;
+  document.getElementById('si').textContent = document.getElementById('fi').value;
+  document.getElementById('sp').textContent = document.getElementById('fp').value;
+  document.getElementById('sph').textContent = document.getElementById('fph').value;
+}
+
+function handleFile(input) {
+  const f = input.files[0]; if(!f) return;
+  file = f;
+  document.getElementById('fname').textContent = f.name;
+  document.getElementById('fchip').classList.add('show');
+  document.getElementById('uz').classList.add('has-file');
+  document.getElementById('btn2').disabled = false;
+}
+
+function clearFile() {
+  file = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('fchip').classList.remove('show');
+  document.getElementById('uz').classList.remove('has-file');
+  document.getElementById('btn2').disabled = true;
+}
+
+async function submit() {
+  document.getElementById('ov').classList.add('show');
+  try {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      const payload = {
+        timestamp: new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'}),
+        studentName: document.getElementById('fn').value,
+        school: document.getElementById('fs').value,
+        grade: document.getElementById('fg').value,
+        idType: document.getElementById('fi').value,
+        parentName: document.getElementById('fp').value,
+        phone: document.getElementById('fph').value,
+        location: sel.location,
+        date: sel.date,
+        time: sel.time,
+        fileName: file.name,
+        fileData: e.target.result.split(',')[1],
+        status: '待審核',
+      };
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      document.getElementById('ov').classList.remove('show');
+      go(4);
+    };
+    reader.readAsDataURL(file);
+  } catch(err) {
+    document.getElementById('ov').classList.remove('show');
+    alert('送出失敗，請稍後再試');
+  }
+}
+
+const uz = document.getElementById('uz');
+uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dragover'); });
+uz.addEventListener('dragleave', () => uz.classList.remove('dragover'));
+uz.addEventListener('drop', e => {
+  e.preventDefault(); uz.classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if(f) {
+    file = f;
+    document.getElementById('fname').textContent = f.name;
+    document.getElementById('fchip').classList.add('show');
+    uz.classList.add('has-file');
+    document.getElementById('btn2').disabled = false;
+  }
+});
+</script>
+</body>
+</html>
