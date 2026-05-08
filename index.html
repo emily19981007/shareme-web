@@ -457,38 +457,48 @@ function clearFile() {
   document.getElementById('uz').classList.remove('has-file');
   document.getElementById('btn2').disabled = true;
 }
-
 async function submit() {
   document.getElementById('ov').classList.add('show');
   try {
-    const payload = {
-      timestamp: new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'}),
-      studentName: document.getElementById('fn').value,
-      school: document.getElementById('fs').value,
-      grade: document.getElementById('fg').value,
-      idType: document.getElementById('fi').value,
-      parentName: document.getElementById('fp').value,
-      phone: document.getElementById('fph').value,
-      location: sel.location,
-      date: sel.date,
-      time: sel.time,
-      fileName: file ? file.name : '',
-      fileData: '',
-      status: '待審核',
+    // 第一步：先把照片轉成 base64
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      
+      const payload = {
+        timestamp: new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'}),
+        studentName: document.getElementById('fn').value,
+        school: document.getElementById('fs').value,
+        grade: document.getElementById('fg').value,
+        idType: document.getElementById('fi').value,
+        parentName: document.getElementById('fp').value,
+        phone: document.getElementById('fph').value,
+        location: sel.location,
+        date: sel.date,
+        time: sel.time,
+        fileName: file.name,
+        fileData: base64,
+        status: '待審核',
+      };
+      
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'text/plain'},
+        body: JSON.stringify(payload),
+      });
+      
+      document.getElementById('ov').classList.remove('show');
+      go(4);
     };
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'text/plain'},
-      body: JSON.stringify(payload),
-    });
-    document.getElementById('ov').classList.remove('show');
-    go(4);
+    reader.readAsDataURL(file);
   } catch(err) {
     document.getElementById('ov').classList.remove('show');
     alert('送出失敗，請稍後再試');
   }
 }
+
+
 
 const uz = document.getElementById('uz');
 uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dragover'); });
