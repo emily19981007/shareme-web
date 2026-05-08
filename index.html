@@ -70,8 +70,7 @@ body { font-family: 'Noto Sans TC', 'Taipei Sans TC Beta', sans-serif; backgroun
 .pb-ball { width: 48px; height: 48px; border-radius: 12px; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
 .course-card.selected .pb-ball { background: rgba(47,140,239,0.15); }
 .course-info { flex: 1; }
-<div class="course-loc">${c.name}</div>
-<div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
+.course-loc { font-weight: 700; font-size: 0.9rem; color: var(--navy); letter-spacing: 0.3px; }
 .course-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: flex; gap: 10px; }
 .meta-item { display: flex; align-items: center; gap: 3px; }
 .spots-badge { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; letter-spacing: 0.3px; }
@@ -372,35 +371,32 @@ body { font-family: 'Noto Sans TC', 'Taipei Sans TC Beta', sans-serif; backgroun
 
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynv2noOqQuWSoMQdBypbSlzqCdVIJ7G-BkAdMTpbt8YRlB6DRUqfNpk-aaI4s2iMxU/exec';
-const COURSES_URL = 'https://script.google.com/macros/s/AKfycbynv2noOqQuWSoMQdBypbSlzqCdVIJ7G-BkAdMTpbt8YRlB6DRUqfNpk-aaI4s2iMxU/exec';
 
-let COURSES = [];
+const PBSVG = `<svg width="32" height="32" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="12" fill="white" stroke="#c4d8f0" stroke-width="1.2"/><circle cx="14" cy="14" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="18" cy="13" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="22" cy="14" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="13" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="17" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="21" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="25" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="14" cy="22" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="18" cy="23" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="22" cy="22" r="1.1" fill="#2f8cef" opacity="0.55"/><rect x="23" y="22" width="9" height="3" rx="1.5" fill="#1a6bc4" transform="rotate(45 23 22)"/></svg>`;
 
-function loadCourses() {
-  COURSES = [
-    {id:'c1', name:'暑期班課程', location:'新莊宏匯 匹克球場', date:'7/13-17', time:'15:00-17:00', spots:8},
-    {id:'c2', name:'暑期班課程', location:'景美河濱 匹克球場', date:'7/20-24', time:'16:00-18:00', spots:8},
-    {id:'c3', name:'暑期班課程', location:'新店小碧潭', date:'8/3-8/7', time:'15:00-17:00', spots:8},
-  ];
-  document.getElementById('course-list').innerHTML = COURSES.map(c => `
-    <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
-     <div class="pb-ball"><svg width="32" height="32" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="12" fill="white" stroke="#c4d8f0" stroke-width="1.2"/><circle cx="14" cy="14" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="18" cy="13" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="22" cy="14" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="13" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="17" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="21" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="25" cy="18" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="14" cy="22" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="18" cy="23" r="1.1" fill="#2f8cef" opacity="0.55"/><circle cx="22" cy="22" r="1.1" fill="#2f8cef" opacity="0.55"/><rect x="23" y="22" width="9" height="3" rx="1.5" fill="#1a6bc4" transform="rotate(45 23 22)"/></svg></div>
-     
-      <div class="course-info">
-        <div class="course-loc">${c.name}</div>
-        <div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
-        <div class="course-meta">
-          <span class="meta-item">📅 ${c.date}</span>
-          <span class="meta-item">🕐 ${c.time}</span>
-        </div>
+const COURSES = [
+  {id:'c1', name:'暑期班課程', location:'新莊宏匯 匹克球場', date:'7/13-17', time:'15:00-17:00', spots:8},
+  {id:'c2', name:'暑期班課程', location:'景美河濱 匹克球場', date:'7/20-24', time:'16:00-18:00', spots:8},
+  {id:'c3', name:'暑期班課程', location:'新店小碧潭', date:'8/3-8/7', time:'15:00-17:00', spots:8},
+];
+
+let sel = null, file = null;
+
+document.getElementById('course-list').innerHTML = COURSES.map(c => `
+  <div class="course-card ${c.spots===0?'full':''}" id="cc${c.id}" onclick="${c.spots>0?`pick('${c.id}')`:''}" >
+    <div class="pb-ball">${PBSVG}</div>
+    <div class="course-info">
+      <div class="course-loc">${c.name}</div>
+      <div class="course-loc" style="font-size:0.78rem;color:var(--text-muted);font-weight:400">${c.location}</div>
+      <div class="course-meta">
+        <span class="meta-item">📅 ${c.date}</span>
+        <span class="meta-item">🕐 ${c.time}</span>
       </div>
-      <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
-      <div class="check-circle" id="chk${c.id}">✓</div>
     </div>
-  `).join('');
-}
-
-loadCourses();
+    <div class="spots-badge ${c.spots>0?'open':'full-badge'}">${c.spots>0?`剩 ${c.spots} 名`:'額滿'}</div>
+    <div class="check-circle" id="chk${c.id}">✓</div>
+  </div>
+`).join('');
 
 function pick(id) {
   document.querySelectorAll('.course-card').forEach(c => c.classList.remove('selected'));
@@ -483,11 +479,10 @@ async function submit() {
         status: '待審核',
       };
       await fetch(APPS_SCRIPT_URL, {
-  method: 'POST',
-  mode: 'no-cors',
-  headers: {'Content-Type': 'text/plain'},
-  body: JSON.stringify(payload),
-});
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'text/plain'},
+        body: JSON.stringify(payload),
       });
       document.getElementById('ov').classList.remove('show');
       go(4);
