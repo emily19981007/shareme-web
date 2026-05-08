@@ -461,33 +461,29 @@ function clearFile() {
 async function submit() {
   document.getElementById('ov').classList.add('show');
   try {
-    const reader = new FileReader();
-    reader.onload = async e => {
-      const payload = {
-        timestamp: new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'}),
-        studentName: document.getElementById('fn').value,
-        school: document.getElementById('fs').value,
-        grade: document.getElementById('fg').value,
-        idType: document.getElementById('fi').value,
-        parentName: document.getElementById('fp').value,
-        phone: document.getElementById('fph').value,
-        location: sel.location,
-        date: sel.date,
-        time: sel.time,
-        fileName: file.name,
-        fileData: e.target.result.split(',')[1],
-        status: '待審核',
-      };
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type': 'text/plain'},
-        body: JSON.stringify(payload),
-      });
-      document.getElementById('ov').classList.remove('show');
-      go(4);
+    const payload = {
+      timestamp: new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'}),
+      studentName: document.getElementById('fn').value,
+      school: document.getElementById('fs').value,
+      grade: document.getElementById('fg').value,
+      idType: document.getElementById('fi').value,
+      parentName: document.getElementById('fp').value,
+      phone: document.getElementById('fph').value,
+      location: sel.location,
+      date: sel.date,
+      time: sel.time,
+      fileName: file ? file.name : '',
+      fileData: '',
+      status: '待審核',
     };
-    reader.readAsDataURL(file);
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(payload),
+    });
+    document.getElementById('ov').classList.remove('show');
+    go(4);
   } catch(err) {
     document.getElementById('ov').classList.remove('show');
     alert('送出失敗，請稍後再試');
